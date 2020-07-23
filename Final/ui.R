@@ -1,5 +1,8 @@
 library(shiny)
 library(shinydashboard)
+library(readr)
+
+EduData <- read.csv("/Users/yilinxie/Desktop/ST558/Project/Project3/Project3/EduData.csv")
 
 ui <- dashboardPage(skin = "red",
                     #add title                  
@@ -54,9 +57,31 @@ ui <- dashboardPage(skin = "red",
                             
                             #Data Exploration tab
                             tabItem(tabName = "data",
+                                    fluidPage(
+                                    #title
+                                    titlePanel(
+                                        uiOutput("title")
+                                    ),
+                                    # Sidebar with options for the data set
+                                    sidebarLayout(
+                                        sidebarPanel(
+                                            h3("Select the Course Topic:"),
+                                            selectizeInput("Topic", "Topic", selected = "English", choices = levels(as.factor(EduData$Topic))),
+                                            br(),
+                                            sliderInput("size", "Size of Points on Graph",
+                                                        min = 0.1, max = 1, value = 0.5, step = 0.1)
+                                            
+                                        ),
+                                    # Show output
+                                    mainPanel(
+                                        plotOutput("Plot"),
+                                        textOutput("info"),
+                                        tableOutput("table")
+                                    )
+                                    ),
                                     
-                            ),
                             
+                            )),
                             #Unsupervised Learning tab
                             tabItem(tabName = "unsuper"),
                             
