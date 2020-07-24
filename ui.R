@@ -84,7 +84,18 @@ ui <- dashboardPage(skin = "red",
                             
                             )),
                             #Unsupervised Learning tab
-                            tabItem(tabName = "unsuper"),
+                            tabItem(tabName = "unsuper",
+                                    fluidPage(
+                                      #title
+                                      mainPanel(
+                                        plotOutput("BiPlot")
+                                      )
+                                    )
+                                    
+                                    
+                                    
+                                    
+                                    ),
                             
                             #Modeling tab
                             tabItem(tabName = "model")

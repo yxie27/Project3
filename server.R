@@ -8,9 +8,8 @@ EduData <- read.csv("EduData.csv")
 
 shinyServer(function(input, output, session){
     newVar <- reactive({
-        #read in data
-        
-        EduData <- EduData %>% select(Topic, gender, NationalITy, PlaceofBirth, raisedhands, Class) %>% filter(Topic == input$Topic)
+        #manipulate data
+        EduData <- EduData %>% select(Topic, gender, NationalITy, PlaceofBirth, raisedhands, Discussion, Class) %>% filter(Topic == input$Topic)
     })
     
     output$title <- renderUI({
@@ -43,4 +42,20 @@ shinyServer(function(input, output, session){
         newData <- newVar()
         newData
     })
+    
+    #create PCA biplot
+    output$BiPlot <- renderPlot({
+        PCs <- prcomp(select(EduData, raisedhands, Discussion) , scale = TRUE)
+        biplot(PCs, xlabs = rep(".", nrow(EduData)), cex = 1.2)
+    })
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 })
