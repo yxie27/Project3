@@ -3,7 +3,7 @@ library(shinydashboard)
 library(readr)
 library(RCurl)
 
-EduData <- read.csv("EduData.csv")
+Data <- read.csv("World Happiness Report.csv")
 
 ui <- dashboardPage(skin = "red",
                     #add title                  
@@ -66,11 +66,11 @@ ui <- dashboardPage(skin = "red",
                                     # Sidebar with options for the data set
                                     sidebarLayout(
                                         sidebarPanel(
-                                            h3("Select the Course Topic:"),
-                                            selectizeInput("Topic", "Topic", selected = "English", choices = levels(as.factor(EduData$Topic))),
+                                            h3("Select the Year:"),
+                                            selectizeInput("Year", "Year", selected = 2018, choices = levels(as.factor(Data$Year))),
                                             br(),
                                             sliderInput("size", "Size of Points on Graph",
-                                                        min = 0.1, max = 1, value = 0.5, step = 0.1)
+                                                        min = 1, max = 10, value = 5, step = 1)
                                             
                                         ),
                                     # Show output
@@ -88,7 +88,8 @@ ui <- dashboardPage(skin = "red",
                                     fluidPage(
                                       #title
                                       mainPanel(
-                                        plotOutput("BiPlot")
+                                        plotOutput("BiPlot"),
+                                        downloadButton("download_BiPlot", "Save image")
                                       )
                                     )
                                     
