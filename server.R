@@ -127,11 +127,51 @@ shinyServer(function(input, output, session){
     
     
 #########################################Modeling#########################################
+    # Regression output
+    output$summary <- renderPrint({
+        newData <- newVar()
+        fit <- lm(newData[,input$outcome] ~ newData[,input$indepvar])
+        names(fit$coefficients) <- c("Intercept", input$var2)
+        summary(fit)
+    })
     
     
+    # Data output
+    newVar2 <- reactive({
+        Data <- RawData
+    })
     
+    output$tbl = DT::renderDataTable({
+        #newData <- newVar()
+        DT::datatable(newVar2(), options = list(lengthChange = FALSE))
+    })
     
+    #download datatable
+    output$download_DataTable2 <- downloadHandler(
+        filename = function(){paste("World Happiness Report dataset.csv")},
+        content = function(file){write.csv(newVar2(), file, row.names = FALSE)}
+    )
     
+    # Scatterplot output
+    output$scatterplot <- renderPlot({
+        newData <- newVar()
+        plot(newData[,input$indepvar], newData[,input$outcome], main="Scatterplot",
+             xlab=input$indepvar, ylab=input$outcome, pch=19)
+        abline(lm(newData[,input$outcome] ~ newData[,input$indepvar]), col="red")
+        lines(lowess(newData[,input$indepvar],newData[,input$outcome]), col="blue")
+    }, height=400)
+    
+    # Histogram output var 1
+    output$distribution1 <- renderPlot({
+        newData <- newVar()
+        hist(newData[,input$outcome], main="", xlab=input$outcome)
+    }, height=300, width=300)
+    
+    # Histogram output var 2
+    output$distribution2 <- renderPlot({
+        newData <- newVar()
+        hist(newData[,input$indepvar], main="", xlab=input$indepvar)
+    }, height=300, width=300)
     
     
     

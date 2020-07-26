@@ -26,6 +26,8 @@ ui <- dashboardPage(skin = "red",
                     #define the body of the app
                     dashboardBody(
                         tabItems(
+                          
+                          
                             #Information tab
                             tabItem(tabName = "info",
                                     fluidRow(
@@ -73,6 +75,7 @@ ui <- dashboardPage(skin = "red",
                                         )
                                     )),
                             
+                            
                             #Data Exploration tab
                             tabItem(tabName = "data",
                                     fluidPage(
@@ -100,6 +103,8 @@ ui <- dashboardPage(skin = "red",
                                     
                             
                             )),
+                            
+                            
                             #Unsupervised Learning tab
                             tabItem(tabName = "pca",
                                     fluidPage(
@@ -148,7 +153,83 @@ ui <- dashboardPage(skin = "red",
                                     ),
                             
                             #Modeling tab
-                            tabItem(tabName = "model"),
+                            tabItem(tabName = "model",
+                                    tabsetPanel(
+                                      tabPanel("Regression Model",
+                                               fluidPage(
+                                                 titlePanel("Regression Model"),
+                                                 sidebarLayout(
+                                                   sidebarPanel(
+                                                     selectInput("outcome", label = h3("Outcome"),
+                                                                 choices = list("Score","GDP.per.capita","Social.support","Healthy.life.expectancy","Freedom.to.make.life.choices","Generosity","Perceptions.of.corruption"), selected = 1),
+                                                     
+                                                     selectInput("indepvar", label = h3("Explanatory variable"),
+                                                                 choices = list("Score","GDP.per.capita","Social.support","Healthy.life.expectancy","Freedom.to.make.life.choices","Generosity","Perceptions.of.corruption"), selected = 1)
+                                                     
+                                                   ),
+                                                   
+                                                   mainPanel(
+                                                     
+                                                     tabsetPanel(type = "tabs",
+                                                                 
+                                                                 tabPanel("Scatterplot", plotOutput("scatterplot")), # Plot
+                                                                 tabPanel("Distribution", # Plots of distributions
+                                                                          fluidRow(
+                                                                            column(6, plotOutput("distribution1")),
+                                                                            column(6, plotOutput("distribution2")))
+                                                                 ),
+                                                                 tabPanel("Model Summary", verbatimTextOutput("summary")), # Regression output
+                                                                 tabPanel("Data", DT::dataTableOutput('tbl'),downloadButton("download_DataTable2", "Download the Dataset")) # Data as datatable
+                                                                 
+                                                     )
+                                                   )
+                                                 ))
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                               
+                                      ),
+                                      tabPanel("Model")
+                                    )
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    ),
+                            
+                            
                             #Scroll through the Data tab
                             tabItem(tabName = "subdata",
                                     mainPanel(
