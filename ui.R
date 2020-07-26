@@ -155,7 +155,7 @@ ui <- dashboardPage(skin = "red",
                             #Modeling tab
                             tabItem(tabName = "model",
                                     tabsetPanel(
-                                      tabPanel("Regression Model",
+                                      tabPanel("Linear Regression Model",
                                                fluidPage(
                                                  titlePanel("Regression Model"),
                                                  sidebarLayout(
@@ -192,6 +192,41 @@ ui <- dashboardPage(skin = "red",
                                                
                                                
                                       ),
+                                      tabPanel("Regression Tree Model",
+                                               fluidPage(
+                                                 titlePanel("Regression Tree Model"),
+                                                 #sidebarLayout(
+                                                   # sidebarPanel(
+                                                   #   sliderInput("ntree","Select the number of trees: ", min = 5, max = 20, value = 5, step = 1)
+                                                   #   
+                                                   #   
+                                                   #   
+                                                   # ),
+                                                   mainPanel(
+                                                     plotOutput("Regre_tree"),
+                                                     verbatimTextOutput("CVtree"),
+                                                     h3("The value of root MSE about the prediction is: "),
+                                                     verbatimTextOutput("prediction1")
+                                                   )
+                                                   
+                                                   
+                                                   
+                                                # )
+                                               )
+                                               ),
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
                                       tabPanel("Model")
                                     )
                                     

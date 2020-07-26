@@ -3,7 +3,7 @@ library(shinydashboard)
 library(dplyr)
 library(ggplot2)
 library(readr)
-
+library(tree)
 
 RawData <- read.csv("World Happiness Report.csv")
 
@@ -48,25 +48,29 @@ shinyServer(function(input, output, session){
     
 
 #########################################Principal Components Analysis#########################################
+    newVar2 <- reactive({
+        Data <- RawData %>% select(-Overall.rank, -Country.or.region,-Year)
+    })
+    
     #create PCA biplot
     output$BiPlot <- renderPlot({
-        newData <- newVar()
-        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
-        biplot(PCs, xlabs = rep(".", nrow(newData)), cex = 1.2)
+        newData2 <- newVar2()
+        PCs <- prcomp(select(newData2, input$Var) , scale = TRUE)
+        biplot(PCs, xlabs = rep(".", nrow(newData2)), cex = 1.2)
         
     })
     
     #create scree plot
     output$ScreePlot <- renderPlot({
-        newData <- newVar()
-        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        newData2 <- newVar2()
+        PCs <- prcomp(select(newData2, input$Var) , scale = TRUE)
         screeplot(PCs, type = "lines")
     })
 
     #create output of PCs    
     output$PCsValue <- renderPrint({
-        newData <- newVar()
-        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        newData2 <- newVar2()
+        PCs <- prcomp(select(newData2, input$Var) , scale = TRUE)
         PCs
     }) 
     
@@ -94,9 +98,9 @@ shinyServer(function(input, output, session){
     
     #Download PCA biplot
     PCAplot <- function(){
-        newData <- newVar()
-        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
-        biplot(PCs, xlabs = rep(".", nrow(newData)), cex = 1.2)
+        newData2 <- newVar2()
+        PCs <- prcomp(select(newData2, input$Var) , scale = TRUE)
+        biplot(PCs, xlabs = rep(".", nrow(newData2)), cex = 1.2)
     }
     
     output$download_BiPlot <- downloadHandler(
@@ -110,8 +114,8 @@ shinyServer(function(input, output, session){
     
     #Download scree plot
     PCAscreeplot <- function(){
-        newData <- newVar()
-        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        newData2 <- newVar2()
+        PCs <- prcomp(select(newData2, input$Var) , scale = TRUE)
         screeplot(PCs, type = "lines")
     }
     
@@ -129,24 +133,19 @@ shinyServer(function(input, output, session){
 #########################################Modeling#########################################
     # Regression output
     output$summary <- renderPrint({
-        newData <- newVar()
-        fit <- lm(newData[,input$outcome] ~ newData[,input$indepvar])
+        newData2 <- newVar2()
+        fit <- lm(newData2[,input$outcome] ~ newData2[,input$indepvar])
         names(fit$coefficients) <- c("Intercept", input$var2)
         summary(fit)
     })
     
     
     # Data output
-    newVar2 <- reactive({
-        Data <- RawData
-    })
-    
     output$tbl = DT::renderDataTable({
-        #newData <- newVar()
         DT::datatable(newVar2(), options = list(lengthChange = FALSE))
     })
     
-    #download datatable
+    
     output$download_DataTable2 <- downloadHandler(
         filename = function(){paste("World Happiness Report dataset.csv")},
         content = function(file){write.csv(newVar2(), file, row.names = FALSE)}
@@ -154,33 +153,70 @@ shinyServer(function(input, output, session){
     
     # Scatterplot output
     output$scatterplot <- renderPlot({
-        newData <- newVar()
-        plot(newData[,input$indepvar], newData[,input$outcome], main="Scatterplot",
+        newData2 <- newVar2()
+        plot(newData2[,input$indepvar], newData2[,input$outcome], main="Scatterplot",
              xlab=input$indepvar, ylab=input$outcome, pch=19)
-        abline(lm(newData[,input$outcome] ~ newData[,input$indepvar]), col="red")
-        lines(lowess(newData[,input$indepvar],newData[,input$outcome]), col="blue")
+        abline(lm(newData2[,input$outcome] ~ newData2[,input$indepvar]), col="red")
+        lines(lowess(newData2[,input$indepvar],newData2[,input$outcome]), col="blue")
     }, height=400)
     
     # Histogram output var 1
     output$distribution1 <- renderPlot({
-        newData <- newVar()
-        hist(newData[,input$outcome], main="", xlab=input$outcome)
+        newData2 <- newVar2()
+        hist(newData2[,input$outcome], main="", xlab=input$outcome)
     }, height=300, width=300)
     
     # Histogram output var 2
     output$distribution2 <- renderPlot({
-        newData <- newVar()
-        hist(newData[,input$indepvar], main="", xlab=input$indepvar)
+        newData2 <- newVar2()
+        hist(newData2[,input$indepvar], main="", xlab=input$indepvar)
     }, height=300, width=300)
     
     
+    #Regression Tree
+    output$Regre_tree <- renderPlot({
+        newData2 <- newVar2()
+        #obtain training and test sets
+        set.seed(123)
+        train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+        test <- dplyr::setdiff(1:nrow(newData2),train)
+        newData2Train <- newData2[train, ]
+        newData2Test <- newData2[test, ]
+        
+        treeFit <- tree(Score ~ ., data=newData2Train)
+        plot(treeFit)
+        text(treeFit)
+    })
     
+    output$CVtree <- renderPrint({
+        newData2 <- newVar2()
+        #obtain training and test sets
+        set.seed(123)
+        train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+        test <- dplyr::setdiff(1:nrow(newData2),train)
+        newData2Train <- newData2[train, ]
+        newData2Test <- newData2[test, ]
+        
+        treeFit <- tree(Score ~ ., data=newData2Train)
+        
+        cvTree <- cv.tree(treeFit)
+        cvTree
+    })
     
-    
-    
-    
-    
-    
+    #prediction
+    output$prediction1 <- renderPrint({
+        newData2 <- newVar2()
+        #obtain training and test sets
+        set.seed(123)
+        train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+        test <- dplyr::setdiff(1:nrow(newData2),train)
+        newData2Train <- newData2[train, ]
+        newData2Test <- newData2[test, ]
+        treeFit <- tree(Score ~ ., data=newData2Train)
+        
+        pred <- predict(treeFit, newdata=dplyr::select(newData2Test, -Score))
+        sqrt(mean((pred-newData2Test$Score)^2))
+    })
     
     
     
@@ -188,10 +224,6 @@ shinyServer(function(input, output, session){
     
 #########################################Scroll through the Data#########################################
     #datatable
-    newVar2 <- reactive({
-        Data <- RawData
-    })
-    
     output$Data_table <- DT::renderDataTable({
         DT::datatable(newVar2())
     })
