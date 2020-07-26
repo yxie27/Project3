@@ -195,13 +195,10 @@ ui <- dashboardPage(skin = "red",
                                       tabPanel("Regression Tree Model",
                                                fluidPage(
                                                  titlePanel("Regression Tree Model"),
-                                                 #sidebarLayout(
-                                                   # sidebarPanel(
-                                                   #   sliderInput("ntree","Select the number of trees: ", min = 5, max = 20, value = 5, step = 1)
-                                                   #   
-                                                   #   
-                                                   #   
-                                                   # ),
+                                                 # sidebarLayout(
+                                                 # sidebarPanel(
+                                                 #   sliderInput("ntree","Select the number of trees: ", min = 5, max = 20, value = 5, step = 1)
+                                                 # ),
                                                    mainPanel(
                                                      plotOutput("Regre_tree"),
                                                      verbatimTextOutput("CVtree"),
@@ -211,7 +208,7 @@ ui <- dashboardPage(skin = "red",
                                                    
                                                    
                                                    
-                                                # )
+                                                 #)
                                                )
                                                ),
                                       
@@ -227,7 +224,26 @@ ui <- dashboardPage(skin = "red",
                                       
                                       
                                       
-                                      tabPanel("Model")
+                                      tabPanel("Random Forests Model",
+                                               fluidPage(
+                                                 titlePanel("Random Forests Model"),
+                                                 sidebarLayout(
+                                                   sidebarPanel(
+                                                     sliderInput("ntree","Select the number of trees: ", min = 100, max = 400, value = 200, step = 10)
+                                                   ),
+                                                   mainPanel(
+                                                     verbatimTextOutput("RF_tree"),
+                                                     verbatimTextOutput("CVtree"),
+                                                     h3("The value of root MSE about the prediction is: "),
+                                                     verbatimTextOutput("prediction2")
+                                                   )
+                                                   
+                                                   
+                                                   
+                                                 )
+                                               )
+                                               
+                                               )
                                     )
                                     
                                     

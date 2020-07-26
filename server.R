@@ -4,6 +4,7 @@ library(dplyr)
 library(ggplot2)
 library(readr)
 library(tree)
+library(randomForest)
 
 RawData <- read.csv("World Happiness Report.csv")
 
@@ -88,9 +89,7 @@ shinyServer(function(input, output, session){
             helpText(""),
             helpText("Solving for the PCs is equivalent to doing an eigenvalue decomposition on the covariance matrix!"),
             helpText("Eigenvectors represent the loadings phi's"),
-            helpText("PCA is usually applied to the covariance matrix.
-                     The covariance of two variables X and Y can be calculated using the following
-                     formula: "),
+            helpText("PCA is usually applied to the covariance matrix.The covariance of two variables X and Y can be calculated using the following formula: "),
             helpText('$$cov(X, Y) = \\frac{1}{n-1} \\sum_{i=1}^{n}(X_i-\\bar{x})(Y_i-\\bar{y})$$'),
             helpText("Eigenvalues represent how much of the variation exists on that PC; Largest eigenvalue (w/eigenvector) correspond to first PC")
         )
@@ -203,7 +202,7 @@ shinyServer(function(input, output, session){
         cvTree
     })
     
-    #prediction
+    #prediction1
     output$prediction1 <- renderPrint({
         newData2 <- newVar2()
         #obtain training and test sets
@@ -219,6 +218,33 @@ shinyServer(function(input, output, session){
     })
     
     
+    #Random Forests modeling
+    output$RF_tree <- renderPrint({
+    newData2 <- newVar2()
+    set.seed(123)
+    train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+    test <- dplyr::setdiff(1:nrow(newData2),train)
+    newData2Train <- newData2[train, ]
+    newData2Test <- newData2[test, ]
+    rfFit <- randomForest(Score ~ ., data=newData2Train, mtry=ncol(newData2Train)/3, ntree = input$ntree, importance=TRUE)
+    rfFit
+    
+    })
+    
+    
+    #prediction2
+    output$prediction2 <- renderPrint({
+        newData2 <- newVar2()
+        set.seed(123)
+        train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+        test <- dplyr::setdiff(1:nrow(newData2),train)
+        newData2Train <- newData2[train, ]
+        newData2Test <- newData2[test, ]
+        rfFit <- randomForest(Score ~ ., data=newData2Train, mtry=ncol(newData2Train)/3, ntree = input$ntree, importance=TRUE)
+        
+        rfPred <- predict(rfFit, newdata = dplyr::select(newData2Test,-Score))
+        sqrt(mean((rfPred-newData2Test$Score)^2))
+    })
     
     
     
