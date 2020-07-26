@@ -4,12 +4,13 @@ library(dplyr)
 library(ggplot2)
 library(readr)
 
-Data <- read.csv("World Happiness Report.csv")
+
+RawData <- read.csv("World Happiness Report.csv")
 
 shinyServer(function(input, output, session){
     newVar <- reactive({
         #manipulate data
-        Data <- Data %>% select(-Overall.rank, -Country.or.region) %>% filter(Year == input$Year)
+        Data <- RawData %>% select(-Overall.rank, -Country.or.region) %>% filter(Year == input$Year)
     })
     
     output$title <- renderUI({
@@ -44,15 +45,60 @@ shinyServer(function(input, output, session){
         newData
     })
     
+
     #create PCA biplot
     output$BiPlot <- renderPlot({
-        PCs <- prcomp(select(Data, GDP.per.capita, Social.support) , scale = TRUE)
-        biplot(PCs, xlabs = rep(".", nrow(Data)), cex = 1.2)
+        newData <- newVar()
+        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        biplot(PCs, xlabs = rep(".", nrow(newData)), cex = 1.2)
+        
     })
     
-    # Download PCA biplot
+    #create scree plot
+    output$ScreePlot <- renderPlot({
+        newData <- newVar()
+        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        screeplot(PCs, type = "lines")
+    })
+
+    #create output of PCs    
+    output$PCsValue <- renderPrint({
+        newData <- newVar()
+        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        PCs
+    }) 
+    
+    
+    # Output PCA math using MathJax
+    output$MathJax <- renderUI({
+        withMathJax(
+            helpText("Goal: Obtain a linear combination of the variables that accounts for the largest amount of variability (location not important for variance, assume 0 mean for each predictor)"),
+            helpText("Find "),
+            helpText("$$z_{i1}=\\phi_{11} x_{i1}+ \\phi_{21} x_{i2} + ......+ \\phi_{p1} x_{ip}$$"),
+            helpText("values so that the set of z's has the largest variance."),
+            helpText("Constraint: $$\\sum_{j=1}^{p}(\\phi^{2}_{j1})=1$$"),
+            helpText("Once first PC found, now find next most variable linear combination."),
+            helpText("Constraint: Must be uncorrelated with 1st PC. Process continues until min(n-1,p) PCs are found"),
+            helpText(""),
+            helpText("Solving for the PCs is equivalent to doing an eigenvalue decomposition on the covariance matrix!"),
+            helpText("Eigenvectors represent the loadings phi's"),
+            helpText("PCA is usually applied to the covariance matrix.
+                     The covariance of two variables X and Y can be calculated using the following
+                     formula: "),
+            helpText('$$cov(X, Y) = \\frac{1}{n-1} \\sum_{i=1}^{n}(X_i-\\bar{x})(Y_i-\\bar{y})$$'),
+            helpText("Eigenvalues represent how much of the variation exists on that PC; Largest eigenvalue (w/eigenvector) correspond to first PC")
+        )
+    })
+    
+    #Download PCA biplot
+    PCAplot <- function(){
+        newData <- newVar()
+        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        biplot(PCs, xlabs = rep(".", nrow(newData)), cex = 1.2)
+    }
+    
     output$download_BiPlot <- downloadHandler(
-        filename = "PCA.png",
+        filename = "PCA_biplot.png",
         content = function(file) {
             png(file)
             PCAplot()
@@ -60,8 +106,22 @@ shinyServer(function(input, output, session){
         }
     )
     
+    #Download scree plot
+    PCAscreeplot <- function(){
+        newData <- newVar()
+        PCs <- prcomp(select(newData, input$Var) , scale = TRUE)
+        screeplot(PCs, type = "lines")
+    }
     
-    
+    output$download_ScreePlot <- downloadHandler(
+        filename = "PCA_Scree_Plot.png",
+        content = function(file) {
+            png(file)
+            PCAscreeplot()
+            dev.off()
+        }
+    )
+
     
     
     

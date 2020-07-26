@@ -3,12 +3,14 @@ library(shinydashboard)
 library(readr)
 library(RCurl)
 
+
 Data <- read.csv("World Happiness Report.csv")
+
 
 ui <- dashboardPage(skin = "red",
                     #add title                  
                     dashboardHeader(
-                        title = "Students' Academic Performance Dataset (xAPI-Edu-Data)",
+                        title = "World Happiness Report 2018-2019",
                         titleWidth = 750),
                     
                     #define sidebar items
@@ -16,7 +18,7 @@ ui <- dashboardPage(skin = "red",
                         sidebarMenu(
                             menuItem(tabName = "info", "Information", icon = icon("dashboard")),
                             menuItem(tabName = "data", "Data Exploration", icon = icon("table")),
-                            menuItem(tabName = "unsuper", "Unsupervised Learning", icon = icon("archive")),
+                            menuItem(tabName = "pca", "Principal Components Analysis", icon = icon("archive")),
                             menuItem(tabName = "model", "Modeling", icon = icon("laptop")),
                             menuItem(tabName = "subdata", "Scroll through the Data", icon = icon("th"))
                         )),
@@ -36,9 +38,19 @@ ui <- dashboardPage(skin = "red",
                                                h1("Data Description"),
                                                #box to contain the description
                                                box(background = "red", width = 12,
-                                                   h3("This is an educational data set which is collected from learning management system (LMS) called Kalboard 360."), 
-                                                   h3("Kalboard 360 is a multi-agent LMS, which has been designed to facilitate learning through the use of leading-edge technology."), 
-                                                   h3("Such system provides users with a synchronous access to educational resources from any device with Internet connection.")
+                                                   h4("The World Happiness Report is a point of interest survey of the state of worldwide bliss. "), 
+                                                   h4("The report proceeds to pick up worldwide acknowledgment as governments, organizations and respectful society progressively utilize joy pointers to educate their policy-making choices. 
+                                                      Driving specialists over areas – financial matters, brain research, overview investigation, national insights, wellbeing, open approach and more – depict how estimations of well-being can be used effectively to evaluate the advance of countries. 
+                                                      The reports survey the state of bliss within the world nowadays and appear how the modern science of bliss clarifies individual and national varieties in bliss."), 
+                                                   h4("This file contains the Happiness Score for 153 countries along with the factors used to explain the score."),
+                                                   h4("The Happiness Score is a national average of the responses to the main life evaluation question asked in the Gallup World Poll (GWP), which uses the Cantril Ladder."),
+                                                   h4("The Happiness Score is explained by the following factors:"),
+                                                   h5("- GDP per capita"),
+                                                   h5("- Social support"),
+                                                   h5("- Healthy Life Expectancy"),
+                                                   h5("- Freedom to make life choices"),
+                                                   h5("- Generosity"),
+                                                   h5("- Perceptions of corruption")
                                                    
                                                )
                                                
@@ -50,8 +62,13 @@ ui <- dashboardPage(skin = "red",
                                                h1("Ability of the APP"),
                                                #box to contain the ability
                                                box(background = "red", width = 12,
-                                                   h3("The tabs across the top of the applet allow for navigation between the marginal order statistic distribution visualization, the joint order statistic distribution visualization, and the theory underlying order statistics."),
-                                                   h3("The controls for the visualization sections of the applet are located to the left and the visualizations are available on the right.")
+                                                   h4("The tabs across the top of the applet allow for navigation between the marginal order statistic distribution visualization, the joint order statistic distribution visualization, and the theory underlying order statistics."),
+                                                   h4("The controls for the visualization sections of the applet are located to the left and the visualizations are available on the right."),
+                                                   h4("Within this app, you can:"),
+                                                   h5("- Explore the common numeric and graphical summaries of the data"),
+                                                   h5("- Apply Principal Components Analysis (PCA)"),
+                                                   h5("- Choose model for certain variables in the dataset and make prediction"),
+                                                   h5("- Scroll through the data")
                                                )
                                         )
                                     )),
@@ -75,7 +92,7 @@ ui <- dashboardPage(skin = "red",
                                         ),
                                     # Show output
                                     mainPanel(
-                                        plotOutput("Plot"),
+                                        plotOutput("Plot"), #downloadButton("download_ggPlot", "Save image")),
                                         textOutput("info"),
                                         tableOutput("table")
                                     )
@@ -84,12 +101,44 @@ ui <- dashboardPage(skin = "red",
                             
                             )),
                             #Unsupervised Learning tab
-                            tabItem(tabName = "unsuper",
+                            tabItem(tabName = "pca",
                                     fluidPage(
                                       #title
+                                      headerPanel(h1("Principal Components Analysis (PCA)")),
+                                      
                                       mainPanel(
-                                        plotOutput("BiPlot"),
-                                        downloadButton("download_BiPlot", "Save image")
+                                        tabsetPanel(
+                                          tabPanel("Introduction", h4("Principal Components Analysis (PCA) is a dimension reduction technique."),
+                                                                   h4("If you have variables, they contain some joint variability/correlation, 
+                                                                       PCA looks for linear combination of those variables that account for most of the variability.")
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   ),
+                                          tabPanel("Algorithm", uiOutput('MathJax')),
+                                          tabPanel("Biplot",
+                                                   sidebarLayout(
+                                                     sidebarPanel(
+                                                       checkboxGroupInput("Var", "Please select variables for Principal Component Analysis:", choices = list("Score","GDP.per.capita","Social.support","Healthy.life.expectancy","Freedom.to.make.life.choices","Generosity","Perceptions.of.corruption"),selected = list("GDP.per.capita","Social.support"))
+                                                     ),
+                                                     mainPanel(
+                                                       h3("The Biplot for the Selected Variables:"),
+                                                       plotOutput("BiPlot"),
+                                                       downloadButton("download_BiPlot", "Save image"),
+                                                       h3("The Scree Plot for the Selected Variables:"),
+                                                       plotOutput("ScreePlot"),
+                                                       downloadButton("download_ScreePlot", "Save image"),
+                                                       h3("The PCs Values for the Selected Variables:"),
+                                                       verbatimTextOutput("PCsValue")
+                                                       )
+                                                     )
+                                                   )
+                                                   
+                                          
+                                        )
+                                       
                                       )
                                     )
                                     
