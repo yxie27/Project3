@@ -13,8 +13,9 @@ shinyServer(function(input, output, session){
         Data <- RawData %>% select(-Overall.rank, -Country.or.region) %>% filter(Year == input$Year)
     })
     
+#########################################Data Exploration#########################################
     output$title <- renderUI({
-        text <- paste0("Investigation in year",input$Year)
+        text <- paste0("Investigation in year ",input$Year)
         h1(text)
     })
     
@@ -46,6 +47,7 @@ shinyServer(function(input, output, session){
     })
     
 
+#########################################Principal Components Analysis#########################################
     #create PCA biplot
     output$BiPlot <- renderPlot({
         newData <- newVar()
@@ -123,6 +125,42 @@ shinyServer(function(input, output, session){
     )
 
     
+    
+#########################################Modeling#########################################
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+#########################################Scroll through the Data#########################################
+    #datatable
+    newVar2 <- reactive({
+        Data <- RawData
+    })
+    
+    output$Data_table <- DT::renderDataTable({
+        DT::datatable(newVar2())
+    })
+    
+    #download datatable
+    output$download_DataTable <- downloadHandler(
+        filename = function(){paste("World Happiness Report dataset.csv")},
+        content = function(file){write.csv(newVar2(), file, row.names = FALSE)}
+    )
     
     
     

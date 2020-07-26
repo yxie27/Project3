@@ -148,7 +148,14 @@ ui <- dashboardPage(skin = "red",
                                     ),
                             
                             #Modeling tab
-                            tabItem(tabName = "model")
+                            tabItem(tabName = "model"),
+                            #Scroll through the Data tab
+                            tabItem(tabName = "subdata",
+                                    mainPanel(
+                                      DT::dataTableOutput('Data_table'),
+                                      downloadButton("download_DataTable", "Download the Dataset")
+                                    )
+                                    )
                             
                         )
                     ))
