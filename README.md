@@ -8,9 +8,10 @@ library(ggplot2)
 library(readr)
 library(tree)
 #library(randomForest)
-library(RCurl)
 library(caret)
 library(httr)
+library(plotly)
+library(RCurl)
 ```
 ## The code required to run the app:
 ``` r
