@@ -14,5 +14,5 @@ library(httr)
 ```
 ## The code required to run the app:
 ``` r
-shiny::runGithub("Project3", "yxie27")
+shiny::runGitHub("Project3", "yxie27")
 ```
