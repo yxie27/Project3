@@ -252,6 +252,20 @@ shinyServer(function(input, output, session){
     sqrt(mean((pred-newData2Test$Score)^2))
   })
   
+  output$prediction1_GDP <- renderPrint({
+    newData2 <- newVar2()
+    #obtain training and test sets
+    set.seed(123)
+    train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+    test <- dplyr::setdiff(1:nrow(newData2),train)
+    newData2Train <- newData2[train, ]
+    newData2Test <- newData2[test, ]
+    
+    treeFit <- tree(Score ~ GDP.per.capita, data=newData2Train)
+    pred <- predict(treeFit, newdata=data.frame(GDP.per.capita=input$pred))
+    pred
+  })
+  
   
   #prediction2
   output$prediction2 <- renderPrint({
@@ -268,6 +282,42 @@ shinyServer(function(input, output, session){
     sqrt(mean((rfPred-newData2Test$Score)^2))
   })
   
+  output$prediction2_GDP <- renderPrint({
+    newData2 <- newVar2()
+    set.seed(123)
+    train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+    test <- dplyr::setdiff(1:nrow(newData2),train)
+    newData2Train <- newData2[train, ]
+    newData2Test <- newData2[test, ]
+    
+    rfFit <- train(Score ~ GDP.per.capita, data=newData2Train, method="rf", ntree=input$numberTree)
+    rfPred <- predict(rfFit, newdata = data.frame(GDP.per.capita=input$pred2))
+    rfPred
+  })
+  
+  
+  output$rf_output <- renderPrint({
+    newData2 <- newVar2()
+    set.seed(123)
+    train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+    test <- dplyr::setdiff(1:nrow(newData2),train)
+    newData2Train <- newData2[train, ]
+    newData2Test <- newData2[test, ]
+    rfFit <- train(Score ~ ., data=newData2Train, method="rf", ntree=input$numberTree)
+    rfFit$results
+  })
+  
+  output$rf_output2 <- renderPrint({
+    newData2 <- newVar2()
+    set.seed(123)
+    train <- sample(1:nrow(newData2), size = nrow(newData2)*0.8)
+    test <- dplyr::setdiff(1:nrow(newData2),train)
+    newData2Train <- newData2[train, ]
+    newData2Test <- newData2[test, ]
+    rfFit <- train(Score ~ ., data=newData2Train, method="rf", ntree=input$numberTree)
+    rfTbl <- table(data.frame(pred = predict(rfFit, newData2Test), true = newData2Test$Score))
+    1-sum(diag(rfTbl)/sum(rfTbl))
+  })
   
   
   #########################################Scroll through the Data#########################################

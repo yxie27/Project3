@@ -1,10 +1,15 @@
 library(shiny)
 library(shinydashboard)
-library(readr)
 library(dplyr)
-library(RCurl)
+library(ggplot2)
+library(readr)
+library(tree)
+#library(randomForest)
+library(caret)
 library(httr)
 library(plotly)
+library(RCurl)
+
 
 
 #Read in data from my Github url address
@@ -197,12 +202,22 @@ ui <- dashboardPage(
                 tabPanel("Regression Tree Model",
                          fluidPage(
                            titlePanel("Regression Tree Model"),
-                           mainPanel(
+                           sidebarLayout(
+                             sidebarPanel(
+                                 sliderInput("pred", "Select the Values of the GDP", min = 0, max = 3, value = 0.001, step = 0.001)
+                               
+                               
+                             ),
+                             mainPanel(
                              plotOutput("Regre_tree"),
                              #verbatimTextOutput("CVtree"),
                              h3("The value of root MSE about the prediction is: "),
-                             verbatimTextOutput("prediction1")
+                             verbatimTextOutput("prediction1"),
+                             h3("The Predicted World Happiness Score is:"),
+                             verbatimTextOutput("prediction1_GDP")
                            )
+                           )
+                           
                          )
                 ),
                 
@@ -213,11 +228,18 @@ ui <- dashboardPage(
                            titlePanel("Random Forests Model"),
                            sidebarLayout(
                              sidebarPanel(
-                               sliderInput("numberTree","Select the Number of Trees: ", min = 10, max = 20, value = 10, step = 2)
+                               sliderInput("numberTree","Select the Number of Trees: ", min = 10, max = 20, value = 10, step = 2),
+                               sliderInput("pred2", "Select the Values of the GDP", min = 0, max = 3, value = 0.001, step = 0.001)
                              ),
                              mainPanel(
-                               h3("The value of root MSE about the prediction is: "),
-                               verbatimTextOutput("prediction2")
+                               h3("The value of root MSE about the prediction is (Slow...Please wait): "),
+                               verbatimTextOutput("prediction2"),
+                               h3("The Results of Random Forest Model (Slow...Please wait): "),
+                               verbatimTextOutput("rf_output"),
+                               h3("The Misclassificatoon Rate is (Slow...Please wait): "),
+                               verbatimTextOutput("rf_output2"),
+                               h3("The Predicted World Happiness Score is (Slow...Please wait):"),
+                               verbatimTextOutput("prediction2_GDP")
                              )
                            )
                          )
