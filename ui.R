@@ -1,13 +1,17 @@
 library(shiny)
 library(shinydashboard)
 library(readr)
+library(dplyr)
 library(RCurl)
 library(httr)
+library(plotly)
+
 
 #Read in data from my Github url address
 url1<-'https://raw.githubusercontent.com/yxie27/Project3/master/World%20Happiness%20Report.csv'
 GET(url1, write_disk(tf <- tempfile(fileext = ".csv")))
 Data <- read.csv(tf)
+Data2 <- Data %>% select(-Overall.rank, -Country.or.region,-Year)
 #Data <- read.csv("World Happiness Report.csv")
 
 
@@ -41,7 +45,7 @@ ui <- dashboardPage(
                        h1("Data Description"),
                        #box to contain the description
                        box(background = "red", width = 12,
-                           em(h4("The World Happiness Report is a point of interest survey of the state of worldwide bliss. ")), 
+                           em(h4(strong("The World Happiness Report")," is a point of interest survey of the state of worldwide bliss. ")), 
                            h4("The report proceeds to pick up worldwide acknowledgment as governments, organizations and respectful society progressively utilize joy pointers to educate their policy-making choices. 
                                                       Driving specialists over areas – financial matters, brain research, overview investigation, national insights, wellbeing, open approach and more – depict how estimations of well-being can be used effectively to evaluate the advance of countries. 
                                                       The reports survey the state of bliss within the world nowadays and appear how the modern science of bliss clarifies individual and national varieties in bliss."), 
@@ -54,7 +58,7 @@ ui <- dashboardPage(
                            em(h5("- Freedom to make life choices")),
                            em(h5("- Generosity")),
                            em(h5("- Perceptions of corruption")),
-                           helpText(a("Click here to get more information", href = "https://www.kaggle.com/mathurinache/world-happiness-report/data"))
+                           helpText(a(strong("Click here to get more information"), href = "https://www.kaggle.com/mathurinache/world-happiness-report/data"))
                        )
                        
                        
@@ -91,14 +95,22 @@ ui <- dashboardPage(
                     selectizeInput("Year", "Year", selected = 2018, choices = levels(as.factor(Data$Year))),
                     br(),
                     sliderInput("size", "Size of Points on Graph",
-                                min = 1, max = 10, value = 5, step = 1)
+                                min = 1, max = 10, value = 5, step = 1),
+                    #DT::dataTableOutput('dataByYear'),
+                    downloadButton("download_DataTable3", "Download the Dataset by Selected Year")
                     
                   ),
                   # Show output
                   mainPanel(
-                    plotOutput("Plot"), #downloadButton("download_ggPlot", "Save image")),
+                    h3("The ggplot of World Happiness Score V.S. GDP : "),
+                    plotOutput("Plot",click = "plot_click"),
+                    h3("Click on plot to get the value of x and y: "),
+                    verbatimTextOutput("clicktext"),
+                    #plotlyOutput("Plot2"),
+                    h3("The numeric summaries: "),
                     textOutput("info"),
-                    tableOutput("table")
+                    #tableOutput("table")
+                    DT::dataTableOutput('dataByYear')
                   )
                 )
                 
@@ -121,17 +133,17 @@ ui <- dashboardPage(
                                                                        PCA looks for linear combination of those variables that account for most of the variability.")
                     ),
                     tabPanel("Algorithm", uiOutput('MathJax')),
-                    tabPanel("Biplot",
+                    tabPanel("Biplot & Scree Plot & PCs Values",
                              sidebarLayout(
                                sidebarPanel(
-                                 checkboxGroupInput("Var", "Please select variables for Principal Component Analysis:", choices = list("Score","GDP.per.capita","Social.support","Healthy.life.expectancy","Freedom.to.make.life.choices","Generosity","Perceptions.of.corruption"),selected = list("GDP.per.capita","Social.support"))
+                                 checkboxGroupInput("Var", "Please select variables for Principal Component Analysis:", choices = names(Data2),selected = list("GDP.per.capita","Social.support"))
                                ),
                                mainPanel(
                                  h3("The Biplot for the Selected Variables:"),
                                  plotOutput("BiPlot"),
                                  downloadButton("download_BiPlot", "Save image"),
                                  h3("The Scree Plot for the Selected Variables:"),
-                                 plotOutput("ScreePlot"),
+                                 plotOutput("Scree_Plot"),
                                  downloadButton("download_ScreePlot", "Save image"),
                                  h3("The PCs Values for the Selected Variables:"),
                                  verbatimTextOutput("PCsValue")
@@ -201,7 +213,7 @@ ui <- dashboardPage(
                            titlePanel("Random Forests Model"),
                            sidebarLayout(
                              sidebarPanel(
-                               sliderInput("numberTree","Select the number of trees: ", min = 10, max = 20, value = 10, step = 2)
+                               sliderInput("numberTree","Select the Number of Trees: ", min = 10, max = 20, value = 10, step = 2)
                              ),
                              mainPanel(
                                h3("The value of root MSE about the prediction is: "),
@@ -234,22 +246,5 @@ ui <- dashboardPage(
     )
   )
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
 )
