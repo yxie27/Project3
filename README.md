@@ -17,3 +17,4 @@ library(RCurl)
 ``` r
 shiny::runGitHub("Project3", "yxie27")
 ```
+## In order to avoid the loss of "Scroll through the data" page (because Random Forest model takes a long time to operate), I put this page before the modeling page.
