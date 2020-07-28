@@ -198,11 +198,14 @@ ui <- dashboardPage(
                                
                                tabsetPanel(type = "tabs",
                                            
-                                           tabPanel("Scatterplot", plotOutput("scatterplot")), # Plot
+                                           tabPanel("Scatterplot", 
+                                                    plotOutput("scatterplot"),
+                                                    downloadButton("download_scatterplot", "Save image")
+                                                    ), 
                                            tabPanel("Distribution", # Plots of distributions
                                                     fluidRow(
-                                                      column(6, plotOutput("distribution1")),
-                                                      column(6, plotOutput("distribution2")))
+                                                      column(6, plotOutput("distribution1"),downloadButton("download_histogram1", "Save image")),
+                                                      column(6, plotOutput("distribution2"),downloadButton("download_histogram2", "Save image")))
                                            ),
                                            tabPanel("Model Summary", verbatimTextOutput("summary")), # Regression output
                                            tabPanel("Data", DT::dataTableOutput('tbl'),downloadButton("download_DataTable2", "Download the Dataset")) # Data as datatable

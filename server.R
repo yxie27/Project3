@@ -206,11 +206,44 @@ shinyServer(function(input, output, session){
     lines(lowess(newData2[,input$indepvar],newData2[,input$outcome]), col="blue")
   }, height=400)
   
+  #Download Scatterplot
+  Scatterplot <- function(){
+    newData2 <- newVar2()
+    plot(newData2[,input$indepvar], newData2[,input$outcome], main="Scatterplot",
+         xlab=input$indepvar, ylab=input$outcome, pch=19)
+    abline(lm(newData2[,input$outcome] ~ newData2[,input$indepvar]), col="red")
+    lines(lowess(newData2[,input$indepvar],newData2[,input$outcome]), col="blue")
+  }
+  
+  output$download_scatterplot <- downloadHandler(
+    filename = "Scatterplot.png",
+    content = function(file) {
+      png(file)
+      Scatterplot()
+      dev.off()
+    }
+  )
+  
   # Histogram output var 1
   output$distribution1 <- renderPlot({
     newData2 <- newVar2()
     hist(newData2[,input$outcome], main="", xlab=input$outcome)
   }, height=300, width=300)
+  
+  #Download Histogram output var 1
+  Histogram1 <- function(){
+    newData2 <- newVar2()
+    hist(newData2[,input$outcome], main="", xlab=input$outcome)
+  }
+  
+  output$download_histogram1 <- downloadHandler(
+    filename = "Histogram1.png",
+    content = function(file) {
+      png(file)
+      Histogram1()
+      dev.off()
+    }
+  )
   
   # Histogram output var 2
   output$distribution2 <- renderPlot({
@@ -218,7 +251,20 @@ shinyServer(function(input, output, session){
     hist(newData2[,input$indepvar], main="", xlab=input$indepvar)
   }, height=300, width=300)
   
+  #Download Histogram output var 2
+  Histogram2 <- function(){
+    newData2 <- newVar2()
+    hist(newData2[,input$indepvar], main="", xlab=input$indepvar)
+  }
   
+  output$download_histogram2 <- downloadHandler(
+    filename = "Histogram2.png",
+    content = function(file) {
+      png(file)
+      Histogram2()
+      dev.off()
+    }
+  )
   
   
   
