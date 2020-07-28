@@ -109,6 +109,7 @@ ui <- dashboardPage(
                   mainPanel(
                     h3("The ggplot of World Happiness Score V.S. GDP : "),
                     plotOutput("Plot",click = "plot_click"),
+                    downloadButton("download_ggPlot", "Save image"),
                     h3("Click on plot to get the value of x and y: "),
                     verbatimTextOutput("clicktext"),
                     #plotlyOutput("Plot2"),

@@ -43,6 +43,21 @@ shinyServer(function(input, output, session){
     paste0("x=", input$plot_click$x, "\ny=", input$plot_click$y)
   })
   
+  #Download ggplot
+  ggplotYear <- function(){
+    newData <- newVar()
+    g <- ggplot(newData, aes(x = GDP.per.capita, y=Score))
+    g + geom_point(size = input$size)
+  }
+  
+  output$download_ggPlot <- downloadHandler(
+    filename = "ggplot.png",
+    content = function(file) {
+      png(file)
+      ggplotYear()
+      dev.off()
+    }
+  )
   
   #create plot using plot_ly
   # output$Plot2 <- renderPlotly({
