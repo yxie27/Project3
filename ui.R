@@ -34,8 +34,8 @@ ui <- dashboardPage(
       menuItem(tabName = "info", "Information", icon = icon("dashboard")),
       menuItem(tabName = "data", "Data Exploration", icon = icon("table")),
       menuItem(tabName = "pca", "Principal Components Analysis", icon = icon("archive")),
-      menuItem(tabName = "model", "Modeling", icon = icon("laptop")),
-      menuItem(tabName = "subdata", "Scroll through the Data", icon = icon("th"))
+      menuItem(tabName = "subdata", "Scroll through the Data", icon = icon("th")),
+      menuItem(tabName = "model", "Modeling", icon = icon("laptop"))
     )),
   
   #define the body of the app
@@ -163,6 +163,20 @@ ui <- dashboardPage(
               )
       ),
       
+      
+      #Scroll through the Data tab
+      tabItem(tabName = "subdata",
+              mainPanel(
+                h3("In order to avoid the loss of this data page (because Random Forest model takes a long time to operate), I put the data page before the modeling."),
+                DT::dataTableOutput('Data_table'),
+                downloadButton("download_DataTable", "Download the Dataset")
+              )
+              
+              
+              
+      ),
+      
+      
       #Modeling tab
       tabItem(tabName = "model",
               tabsetPanel(
@@ -228,7 +242,7 @@ ui <- dashboardPage(
                            titlePanel("Random Forests Model"),
                            sidebarLayout(
                              sidebarPanel(
-                               sliderInput("numberTree","Select the Number of Trees: ", min = 10, max = 20, value = 10, step = 2),
+                               sliderInput("numberTree","Select the Number of Trees: ", min = 1, max = 12, value = 6, step = 1),
                                sliderInput("pred2", "Select the Values of the GDP", min = 0, max = 3, value = 0.001, step = 0.001)
                              ),
                              mainPanel(
@@ -248,18 +262,9 @@ ui <- dashboardPage(
                 
                 
                 
-              )),
+              ))
       
-      #Scroll through the Data tab
-      tabItem(tabName = "subdata",
-              mainPanel(
-                DT::dataTableOutput('Data_table'),
-                downloadButton("download_DataTable", "Download the Dataset")
-              )
-              
-              
-              
-      )
+
       
       
       
